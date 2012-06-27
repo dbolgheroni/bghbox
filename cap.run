@@ -1,0 +1,3 @@
+#!/bin/sh
+
+fswebcam -r640x480 --png -1 --subtitle "Daniel Bolgheroni" -D1 $@ 

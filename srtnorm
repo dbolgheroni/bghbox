@@ -1,0 +1,36 @@
+#!/bin/sh
+#    mv $1 $1.tmp
+#    $TOOL -f iso-8859-1 -t utf-8 $1.tmp > $1
+#    rm $1.tmp
+
+TOOL=iconv
+
+#if [ -z $@ ]; then
+#    echo "usage: $0 [file ...]"
+#else
+#    for filename in "$@"; do
+#	echo $filename
+#    done
+#fi
+
+if [ -z $1 ]; then
+    echo "usage: $0 [file ...]"
+else
+    for filename in "$@"; do
+	if [ -e $filename ]; then
+	    mv $filename $filename.tmp
+	    
+	    $TOOL -s -f iso-8859-1 -t utf-8 $filename.tmp > $filename
+	    CHECK=$?
+	    if [ $CHECK -eq 0 ]; then
+		echo "$filename (converted!)"
+	    else
+		echo "$filename (ERROR)"
+	    fi	    
+	    
+	    rm -fr $filename.tmp
+	else
+	    echo "$filename (file not found)"
+	fi
+    done
+fi

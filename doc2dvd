@@ -1,0 +1,112 @@
+#!/bin/sh
+
+package1=mencoder
+package2=ffmpeg
+package3=dvdauthor
+output=dvd
+version=0.1
+me=$0
+usage="usage: $me [-n] video"
+
+# some presentation
+echo "$me v$version: script to convert video files to DVD"
+echo "Copyright (c) 2011, Daniel Bolgheroni."
+echo "Problems? daniel@bolgh.eng.br."
+echo
+
+# test to see if the packages needed are present
+echo "Checking for packages needed:"
+echo -n $package1...
+if [ `whereis $package1` ]; then
+    echo ' OK.' 
+else
+    echo ' not found.'
+    exit 1
+fi
+
+echo -n $package2...
+if [ `whereis $package2` ]; then
+    echo ' OK.'
+else
+    echo ' not found.'
+    exit 1
+fi
+
+echo -n $package3...
+if [ `whereis $package3` ]; then
+    echo ' OK.'
+else
+    echo ' not found.'
+    exit 1
+fi
+
+# treat argument(s)
+while getopts ":s" opt; do
+    case $opt in
+	s) nosubtitle=1 ;;
+	\?) echo
+	    echo $usage
+	    exit 1 ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+# exit if the file doesn't exists
+if [ ! -e $1 ]; then
+    echo
+    echo "$me: error: file not found"
+    echo $usage
+    exit 1
+fi
+
+# exit if no argument is supplied
+if [ -z $@ ]; then
+    echo
+    echo $usage
+    exit 1
+fi
+
+case $1 in
+    *.avi)  subtitle=${1%.avi} ;;
+#   *.mkv)  subtitle=${1%.mkv} ;;
+#   *.rmvb) subtitle=${1%.rmvb} ;;
+#   *.mp4)  subtitle=${1%.mp4} ;;
+    *)
+	echo
+	echo "$me: format not supported"
+	exit 1 ;;
+esac
+
+if [ -z $nosubtitle ]; then
+    echo
+    echo "\033[33;1m===> $package1\033[m (this may take some time...)"
+    $package1 -o /dev/null -noidx -oac copy -ovc lavc -lavcopts \
+	vcodec=mpeg4:trell:mbd=1:vpass=1 -font 'Arial:style=Bold' -utf8 \
+	-sub $subtitle.srt $1 && \
+	
+    $package1 -o $output.avi -noidx -oac copy -ovc lavc -lavcopts \
+	vcodec=mpeg4:trell:mbd=1:vpass=2 -font 'Arial:style=Bold' -utf8 \
+	-sub $subtitle.srt $1
+else
+    cp $1 $output.avi
+fi
+
+echo
+echo "\033[33;1m===> $package2\033[m"
+$package2 -i $output.avi -y -target ntsc-dvd -sameq -aspect 4:3 \
+    -loglevel quiet $output.mpg
+
+echo
+echo "\033[33;1m===> $package3\033[m"
+$package3 --title -o $output -f $output.mpg && \
+    $package3 -o $output -T
+
+echo
+echo "\033[33;1m===> Removing temporary files created...\033[m"
+rm -fr $output.avi $output.mpg divx2pass.log
+
+echo
+echo "\033[33;1m===> Convertion done.\033[m"
+echo 'To burn your DVD in a disc, you can use the following command:'
+echo '  $ growisofs -dvd-compat -dvd-video -speed=4 -Z/dev/dvd dvd/'
+echo 'Thank you for using. Problems? dbolgheroni@gmail.com.'

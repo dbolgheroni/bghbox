@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# script to convert flac files to mp3
+#
+# Copyright (c) 2009, Daniel Bolgheroni.
+#
+# REQUIREMENTS:
+# remember you need audio/flac and audio/lame installed
+
+for i in *.flac
+do
+	echo "===> converting \"$i\""
+	echo "---> to wav (intermediate)"
+	flac -s -d "$i"
+	echo "---> to mp3"
+	i=`ls *.wav`
+	lame --quiet --preset standard "$i"
+	
+	echo "===> removing (intermediate)"
+	rm -fr "$i"
+
+	echo ""
+done
+
+  

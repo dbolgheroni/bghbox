@@ -1,0 +1,6 @@
+#!/bin/sh
+
+WIDTH=`tput co`
+HEIGHT=`tput li`
+
+echo "${WIDTH}x${HEIGHT}"

@@ -1,0 +1,12 @@
+BRENAME
+
+September 6, 2011
+
+%!target: man
+%!postproc(man): ' \(#\w+\)' ''
+
+= NAME =
+brename - bulk rename files
+
+= SYNOPSIS =
+**brename** [//options//]

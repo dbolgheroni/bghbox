@@ -1,0 +1,5 @@
+#!/bin/sh
+
+GAME=$*
+
+sdlmame -rompath ./ -video opengl -keepaspect -effect scanlines_ag $GAME

@@ -1,0 +1,2 @@
+scummvm --savepath=~/games/the_dig/save --path=~/games/the_dig/DIG \
+--subtitles --aspect-ratio dig

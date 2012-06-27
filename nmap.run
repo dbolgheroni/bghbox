@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# maybe from Windows nmap "default" scan
+nmap -PE -PA21,23,80,3389 -A -v -T4 $1

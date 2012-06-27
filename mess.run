@@ -1,0 +1,7 @@
+#!/bin/sh
+
+PLAT=$1
+GAME=$2
+
+sdlmess $PLAT -cart $GAME -effect scanlines_ag -video opengl \
+-keepaspect $3 $4

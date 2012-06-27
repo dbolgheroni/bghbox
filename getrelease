@@ -1,0 +1,15 @@
+#!/bin/sh
+
+ARCH=`uname -m`
+RELEASE=4.9
+RELEASE_=49
+FTP_SERVER=$1
+
+if [ -z $FTP_SERVER ]; then
+    echo "usage: $0 [ftpserver]"
+else
+wget -cr -R install$RELEASE_.iso ftp://$FTP_SERVER/pub/OpenBSD/$RELEASE/$ARCH \
+  ftp://$FTP_SERVER/pub/OpenBSD/$RELEASE/ports.tar.gz \
+  ftp://$FTP_SERVER/pub/OpenBSD/$RELEASE/src.tar.gz \
+  ftp://$FTP_SERVER/pub/OpenBSD/$RELEASE/sys.tar.gz
+fi
