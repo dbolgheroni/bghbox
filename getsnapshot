@@ -6,7 +6,7 @@ VERSION='0.2'
 arch=`uname -m`
 
 # Uncomment if not debugging
-wget -q $MIRRORS
+ftp -V $MIRRORS
 
 servers=`grep 'ftp://' ftp.html | \
     sed 's/^[[:space:]]//; s/<a href=.*//; s/<\/a>//' | \
@@ -30,11 +30,17 @@ echo 'Servers available: '
 #    echo "$i) $each"
 #done
 
+date=`date '+%Y%m%d'`
+dirname="newsnapshot-${date}"
+mkdir $dirname
+cd $dirname
+
 PS3='Server? '
 select server in $servers; do
     if [ $server ]; then
-        wget -cr -R install*.iso \
-	    ${server[$chosen]}snapshots/$arch \
+        ftp ${server[$chosen]}snapshots/$arch/INSTALL* \
+            ${server[$chosen]}snapshots/$arch/bsd* \
+            ${server[$chosen]}snapshots/$arch/*.tgz \
 	    ${server[$chosen]}snapshots/ports.tar.gz
 	
         echo 'Finished.'
@@ -44,4 +50,4 @@ select server in $servers; do
     fi
 done
 
-
+cd ..
