@@ -8,5 +8,5 @@ if [ -z $DEVICE ]; then
 else
     cd
     rsync -rlptv --delete --exclude-from=$HOME/.rsync-exclude-file \
-	. mnt/$DEVICE/$BACKUPDIR-`hostname -s`
+	. /mnt/$DEVICE/$BACKUPDIR-`hostname -s`
 fi
