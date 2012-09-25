@@ -10,7 +10,7 @@ FILE=$@
 if [ -z $FILE ]; then
     echo "usage: $0 file"
 else
-mplayer -vo xv -cache 131072 -cache-min 50 \
+mplayer -vo gl -cache 131072 -cache-min 50 \
     -font 'Liberation Sans:style=Bold' \
     -utf8 -hardframedrop -nocorrect-pts $FILE
 fi
