@@ -62,8 +62,9 @@ foreach $file (@ARGV) {
 
     # compute extension once
     if ($n <= 1) {
-	$extension = $ARGV[0];
-	$extension =~ s/.*\.//;
+        $extension = $ARGV[0];
+        $extension =~ s/.*\.//;
+        $extension = lc $extension;
     }
 
     print ("$file -> $opt_p$number.$extension\n");
