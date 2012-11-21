@@ -31,7 +31,7 @@ echo 'Servers available: '
 #done
 
 date=`date '+%Y%m%d'`
-dirname="newsnapshot-${date}"
+dirname="snapshot-${date}"
 mkdir $dirname
 cd $dirname
 
