@@ -1,0 +1,33 @@
+Ao rodar, todo processo executa uma chamada de sistema fork(2) para
+iniciar as estruturas internas básicas do kernel a fim de que possa
+rodar.
+
+Uma maneira prática de ver como essas chamadas de sistema são feitas
+ao iniciar cada novo processo, é através do utilitário ktrace(1). Para
+isso, no shell, execute o seguinte comando:
+
+     $ ktrace -f ls_ktrace.out -tc sh
+
+Esse comando rodará um novo shell, e a cada chamada de sistema será
+gerado um log no arquivo especificado pelo parâmetro '-f'. Nesse novo
+shell, rode um comando qualquer, como, por exemplo, o 'ls'. Depois
+saia, com o comando 'exit'.
+
+Com o 'exit', o shell sendo monitorado será fechado e retornará no
+mesmo shell de que rodou o comando 'ktrace'.
+
+Neste exemplo, o arquivo gerado foi o 'ls_ktrace.out'. Não é um
+arquivo de texto comum, portanto é necessária a utilização do
+utilitário 'kdump'. Para isso:
+
+     $ kdump -f ls_ktrace.out | less
+
+O resultado será as chamadas de sistema que o processo executou desde
+o início do monitoramento até o final (quando chamou o comando 'exit'
+do shell monitorado). Se no shell monitorado foi rodado somente um
+comando (no exemplo, o 'ls'), devem ter somente 2 chamadas a fork(),
+que na realidade é somente uma: ao se chamar a função e ao retornar.
+
+O shell sendo monitorado, ao rodar o 'ls', faz uma chamada de sistema
+fork(2) para rodar o comando 'ls'. O 'ls' é um processo-filho do shell
+monitorado.
