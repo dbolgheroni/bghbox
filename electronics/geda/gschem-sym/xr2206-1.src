@@ -1,0 +1,75 @@
+# This is the template file for creating symbols with tragesym
+# every line starting with '#' is a comment line.
+
+[options]
+# wordswap swaps labels if the pin is on the right side an looks like this:
+#   "PB1 (CLK)". That's useful for micro controller port labels
+# rotate_labels rotates the pintext of top and bottom pins
+#   this is useful for large symbols like FPGAs with more than 100 pins
+# sort_labels will sort the pins by it's labels
+#   useful for address ports, busses, ...
+wordswap=yes
+rotate_labels=no
+sort_labels=yes
+generate_pinseq=yes
+sym_width=1400
+pinwidthvertical=300
+pinwidthhorizontal=300
+
+[geda_attr]
+# name will be printed in the top of the symbol
+# name is only some graphical text, not an attribute
+# version specifies a gschem version.
+# if you have a device with slots, you'll have to use slot= and slotdef=
+# use comment= if there are special information you want to add
+version=20060113 1
+name=XR2206
+device=XR2206
+refdes=U?
+footprint=DIP16
+description=Exar XR2206 monolithic function generator
+documentation=http://www.exar.com/Common/Content/Document.ashx?id=1294
+author=Daniel Bolgheroni <dbolgheroni@gmail.com>
+#dist-license=
+#use-license=
+numslots=0
+#slot=1
+#slotdef=1:
+#slotdef=2:
+#slotdef=3:
+#slotdef=4:
+#comment=
+#comment=
+#comment=
+
+[pins]
+# tabseparated list of pin descriptions
+# ----------------------------------------
+# pinnr is the physical number of the pin
+# seq is the pinseq= attribute, leave it blank if it doesn't matter
+# type can be (in, out, io, oc, oe, pas, tp, tri, clk, pwr)
+# style can be (line,dot,clk,dotclk,none). none if only want to add a net
+# posit. can be (l,r,t,b) or empty for nets
+# net specifies the name of the net. Vcc or GND for example.
+# label represents the pinlabel.
+#	negation lines can be added with "\_" example: \_enable\_ 
+#	if you want to write a "\" use "\\" as escape sequence
+#-----------------------------------------------------
+#pinnr	seq	type	style	posit.	net	label	
+#-----------------------------------------------------
+1		in	line	l		AMSI
+2		out	line	l		STO
+3		out	line	l		MO
+4		pwr	none		Vcc	
+5		in	line	l		TC1
+6		in	line	l		TC2
+7		out	line	l		TR1
+8		out	line	l		TR2
+9		in	line	r		FSKI
+10		out	line	r		BIAS
+11		out	line	r		SYNCO
+12		pwr	none	r	GND	
+13		in	line	r		WAVEA1
+14		in	line	r		WAVEA2
+15		in	line	r		SYMA1
+16		in	line	r		SYMA2
