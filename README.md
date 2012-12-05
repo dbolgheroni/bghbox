@@ -2,8 +2,8 @@ bghbox
 ======
 
 Random personal tools, scripts, wrappers, tests, demonstrations, etc.
-Usually, what it's in my ~/bin, and it isn't worth to have different
-repositories for every one. 
+Also includes electronics, anotations and other projects sketches which
+is often not worthy to create a new project on its own.
 
 * files that end with a .run are simple wrappers to existing and usually
   has no more than a single line, has no error checks or more elaborated
