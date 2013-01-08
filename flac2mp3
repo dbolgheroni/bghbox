@@ -9,17 +9,16 @@
 
 for i in *.flac
 do
-	echo "===> converting \"$i\""
-	echo "---> to wav (intermediate)"
-	flac -s -d "$i"
-	echo "---> to mp3"
-	i=`ls *.wav`
-	lame --quiet --preset standard "$i"
-	
-	echo "===> removing (intermediate)"
-	rm -fr "$i"
+    echo "converting to wav (intermediate)"
+    flac -s -d "$i"
+    echo "converting wav to mp3 (lame)"
+    i=`ls *.wav`
+    lame --quiet --preset standard "$i"
 
-	echo ""
+    echo "removing intermediate"
+    rm -fr "$i"
+
+    echo ""
 done
 
   
