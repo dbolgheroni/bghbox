@@ -1,1 +1,1 @@
-ulimit -d 1048576 && firefox &
+ulimit -d 1048576 && firefox
