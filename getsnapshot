@@ -28,34 +28,69 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
 -- some definitions
-cmd = { name = "ftp -V ",
-        list = "ftp://ftp.openbsd.org/pub/OpenBSD/ftplist" }
+cmd = "ftp -V "
+ftplist = "ftp://ftp.openbsd.org/pub/OpenBSD/ftplist"
 
--- fetch a list of ftp sites to a local file
+-- arch
+u = io.popen("uname -m")
+arch = u:read() 
+
+-- files needed
+files = { "snapshots/" .. arch .. "/bsd*",
+          "snapshots/" .. arch .. "/*.tgz",
+          "snapshots/ports.tar.gz" }
+
+-- fetch a list of ftp sites from the official site
 fetchlist = function ()
-    print(string.format("fetching FTP list from %s", cmd.list))
-    os.execute(cmd.name .. cmd.list)
+    print(string.format("fetching FTP list from %s", ftplist))
+    os.execute(cmd .. ftplist)
 end
 
--- read the sites from local file and returns a table
+-- read the sites from local file 'ftplist' and returns a table
 readlist = function ()
     local sites = {}
     for f in io.lines("ftplist") do
-        s = string.gsub(f, "%s+.*", "")
-        sites[#sites + 1] = s
+        -- add ftp sites to a table
+        if string.match(f, "^ftp") then
+            s = string.gsub(f, "%s+.*", "")
+            sites[#sites + 1] = s
+        end
     end
 
     return sites
 end
 
--- print the list of sites passed as an argument
+-- print the list of sites passed in a table as argument
 printlist = function (sites)
     for i,v in ipairs(sites) do
-        print(string.format("%d) %s", i, v))
+        print(string.format("%3d) %s", i, v))
     end
 end
 
 -- STARTS HERE
---fetchlist()
+fetchlist()
 sites = readlist()
+
+-- outputs
 printlist(sites)
+io.write("Site? ")
+i = tonumber(io.read())
+print("downloading snapshot into cwd")
+
+-- validate and download
+if (i > #sites) or (i <= 0) then
+    print("no such site")
+    os.exit()
+else
+    local function concatfiles ()
+        local allfiles = ""
+        for j, f in ipairs(files) do
+            allfiles = allfiles .. string.format("%s/%s ", sites[i], f)
+        end
+
+        return allfiles
+    end
+
+    dlcmd = cmd .. concatfiles()
+    assert(os.execute(dlcmd), "can't download snapshot")
+end
