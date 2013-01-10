@@ -74,19 +74,22 @@ sites = readlist()
 -- outputs
 printlist(sites)
 io.write("Site? ")
-i = tonumber(io.read())
+op = tonumber(io.read())
 print("downloading snapshot into cwd")
 
 -- validate and download
-if (i > #sites) or (i <= 0) then
+if (op > #sites) or (op <= 0) then
     print("no such site")
     os.exit()
 else
     local function concatfiles ()
-        local allfiles = ""
-        for j, f in ipairs(files) do
-            allfiles = allfiles .. string.format("%s/%s ", sites[i], f)
+        -- 11.6 String Buffers algorithm from 2nd ed of PiL
+        local a = {}
+        for i, f in ipairs(files) do -- 'i' isn't used
+            a[#a + 1] = f
         end
+        a[#a + 1] = ""
+        allfiles = table.concat(a, "\n")
 
         return allfiles
     end
