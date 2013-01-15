@@ -36,9 +36,9 @@ u = io.popen("uname -m")
 arch = u:read() 
 
 -- files needed
-files = { "snapshots/" .. arch .. "/bsd*",
-          "snapshots/" .. arch .. "/*.tgz",
-          "snapshots/ports.tar.gz" }
+files = { "/snapshots/" .. arch .. "/bsd*",
+          "/snapshots/" .. arch .. "/*.tgz",
+          "/snapshots/ports.tar.gz" }
 
 -- fetch a list of ftp sites from the official site
 fetchlist = function ()
@@ -83,17 +83,17 @@ if (op > #sites) or (op <= 0) then
     os.exit()
 else
     local function concatfiles ()
-        -- 11.6 String Buffers algorithm from 2nd ed of PiL
+        -- 11.6 String Buffers algorithm from PiL 2
         local a = {}
         for i, f in ipairs(files) do -- 'i' isn't used
-            a[#a + 1] = f
+            a[#a + 1] = sites[op] .. f
         end
-        a[#a + 1] = ""
-        allfiles = table.concat(a, "\n")
+        allfiles = table.concat(a, " ")
 
         return allfiles
     end
 
     dlcmd = cmd .. concatfiles()
+    print(dlcmd)
     assert(os.execute(dlcmd), "can't download snapshot")
 end
