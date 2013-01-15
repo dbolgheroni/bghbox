@@ -36,7 +36,8 @@ u = io.popen("uname -m")
 arch = u:read() 
 
 -- files needed
-files = { "/snapshots/" .. arch .. "/bsd*",
+files = { "/snapshots/" .. arch .. "/INSTALL." .. arch,
+          "/snapshots/" .. arch .. "/bsd*",
           "/snapshots/" .. arch .. "/*.tgz",
           "/snapshots/ports.tar.gz" }
 
