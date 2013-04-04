@@ -1,0 +1,15 @@
+PID  | Description
+-----+----------------------------------------------------------
+0104 | Calculated engine load value
+0105 | Engine coolant temperature
+010C | Engine RPM
+010D | Vehicle speed
+010F | Intake air temperature
+011F | Run time since engine start
+0121 | Distance traveled with malfunction indicator lamp (MIL) on
+012F | Fuel Level Input
+0130 | # of warm-ups since codes cleared
+0131 | Distance traveled since codes cleared
+0146 | Ambient air temperature
+014D | Time run with MIL on
+0152 | Ethanol fuel %
