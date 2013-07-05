@@ -1,4 +1,7 @@
 #!/bin/sh
 
-# maybe from Windows nmap "default" scan
-nmap -O -PE -PA21,23,80,3389 -A -v -T4 $1
+# from Windows nmap "default" scan
+#nmap -O -PE -PA21,23,80,3389 -A -v -T4 $1
+
+# from zenmap "Intense scan, all TCP ports"
+nmap -p 1-65535 -T4 -A -v $1
