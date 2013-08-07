@@ -88,7 +88,7 @@ while (<CONTACTS>) {
         } elsif (/WORK/) {
             $contacts[$i]{teln}[$k]{type} = "workphone";
         } else {
-            $contacts[$i]{teln}[$k]{type} = “other”;
+            $contacts[$i]{teln}[$k]{type} = "other";
         }
 
         s/.*://;
