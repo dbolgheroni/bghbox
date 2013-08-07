@@ -45,6 +45,7 @@
 #   - redirect to a file to abook can use it
 
 use strict;
+use MIME::QuotedPrint;
 
 my (@contacts, $i, $j, $k, $nemail, $ntel, $nrec, $name, @teln, @email);
 
@@ -67,7 +68,8 @@ while (<CONTACTS>) {
         $k = 0; # reset var with a new record 
 
         s/FN://; 
-        $contacts[$i]{name} = $_;
+        s/FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE//;
+        $contacts[$i]{name} = decode_qp($_);
     }
 
     if (/^EMAIL/) {
