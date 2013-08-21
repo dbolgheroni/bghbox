@@ -1,52 +1,29 @@
 #!/bin/sh
 
-MIRRORS='http://www.openbsd.org/ftp.html'
-I='getsnapshot'
-VERSION='0.2'
+listurl='ftp://ftp.openbsd.org/pub/OpenBSD/ftplist'
 arch=`uname -m`
 
-# Uncomment if not debugging
-ftp -V $MIRRORS
-
-servers=`grep 'ftp://' ftp.html | \
-    sed 's/^[[:space:]]//; s/<a href=.*//; s/<\/a>//' | \
-    sed 'N; s/\n//'`
-
-# Uncomment if not debugging
-if [ -e ftp.html ]; then
-    rm -fr ftp.html
+# download and parse ftp list
+ftp -V $listurl
+servers=`cat ftplist | sed 's/[[:space:]].*//'`
+if [ -e ftplist ]; then
+   rm -fr ftplist
 fi
 
 # presentation
-#echo "$I v$VERSION"
-#echo "\$release=$release" #debug only
 echo 'Servers available: '
 
-# no CVS, so left here for (MY) reference
-#let i=0
-#for each in $servers; do
-#    i=$((i + 1))
-#    server[$i]=$each
-#    echo "$i) $each"
-#done
-
-date=`date '+%Y%m%d'`
-dirname="snapshot-${date}"
-mkdir $dirname
-cd $dirname
-
-PS3='Server? '
+PS3='Choose a server: '
 select server in $servers; do
     if [ $server ]; then
-        ftp ${server[$chosen]}snapshots/$arch/INSTALL* \
-            ${server[$chosen]}snapshots/$arch/bsd* \
-            ${server[$chosen]}snapshots/$arch/*.tgz \
-	    ${server[$chosen]}snapshots/ports.tar.gz
-	
-        echo 'Finished.'
+        ftp -V \
+            ${server}/snapshots/$arch/INSTALL* \
+            ${server}/snapshots/$arch/bsd* \
+            ${server}/snapshots/$arch/*.tgz \
+            ${server}/snapshots/ports.tar.gz
         break
     else
-        echo 'Invalid selection.'
+        echo 'invalid selection'
     fi
 done
 
