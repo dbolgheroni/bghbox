@@ -1,100 +1,53 @@
-#!/usr/bin/env lua
---[[
-Copyright (c) 2012, Daniel Bolgheroni. All rights reserved.
+#!/bin/sh
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+MIRRORS='http://www.openbsd.org/ftp.html'
+I='getsnapshot'
+VERSION='0.2'
+arch=`uname -m`
 
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
+# Uncomment if not debugging
+ftp -V $MIRRORS
 
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in
-     the documentation and/or other materials provided with the
-     distribution.
+servers=`grep 'ftp://' ftp.html | \
+    sed 's/^[[:space:]]//; s/<a href=.*//; s/<\/a>//' | \
+    sed 'N; s/\n//'`
 
-THIS SOFTWARE IS PROVIDED BY DANIEL BOLGHERONI ''AS IS'' AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL DANIEL BOLGHERONI OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
---]]
+# Uncomment if not debugging
+if [ -e ftp.html ]; then
+    rm -fr ftp.html
+fi
 
--- some definitions
-cmd = "ftp -V "
-ftplist = "ftp://ftp.openbsd.org/pub/OpenBSD/ftplist"
+# presentation
+#echo "$I v$VERSION"
+#echo "\$release=$release" #debug only
+echo 'Servers available: '
 
--- arch
-u = io.popen("uname -m")
-arch = u:read() 
+# no CVS, so left here for (MY) reference
+#let i=0
+#for each in $servers; do
+#    i=$((i + 1))
+#    server[$i]=$each
+#    echo "$i) $each"
+#done
 
--- files needed
-files = { "/snapshots/" .. arch .. "/INSTALL." .. arch,
-          "/snapshots/" .. arch .. "/bsd*",
-          "/snapshots/" .. arch .. "/*.tgz",
-          "/snapshots/ports.tar.gz" }
+date=`date '+%Y%m%d'`
+dirname="snapshot-${date}"
+mkdir $dirname
+cd $dirname
 
--- fetch a list of ftp sites from the official site
-fetchlist = function ()
-    print(string.format("fetching FTP list from %s", ftplist))
-    os.execute(cmd .. ftplist)
-end
+PS3='Server? '
+select server in $servers; do
+    if [ $server ]; then
+        ftp ${server[$chosen]}snapshots/$arch/INSTALL* \
+            ${server[$chosen]}snapshots/$arch/bsd* \
+            ${server[$chosen]}snapshots/$arch/*.tgz \
+	    ${server[$chosen]}snapshots/ports.tar.gz
+	
+        echo 'Finished.'
+        break
+    else
+        echo 'Invalid selection.'
+    fi
+done
 
--- read the sites from local file 'ftplist' and returns a table
-readlist = function ()
-    local sites = {}
-    for f in io.lines("ftplist") do
-        -- add ftp sites to a table
-        if string.match(f, "^ftp") then
-            s = string.gsub(f, "%s+.*", "")
-            sites[#sites + 1] = s
-        end
-    end
-
-    return sites
-end
-
--- print the list of sites passed in a table as argument
-printlist = function (sites)
-    for i,v in ipairs(sites) do
-        print(string.format("%3d) %s", i, v))
-    end
-end
-
--- STARTS HERE
-fetchlist()
-sites = readlist()
-
--- outputs
-printlist(sites)
-io.write("Site? ")
-op = tonumber(io.read())
-print("downloading snapshot into cwd")
-
--- validate and download
-if (op > #sites) or (op <= 0) then
-    print("no such site")
-    os.exit()
-else
-    local function concatfiles ()
-        -- 11.6 String Buffers algorithm from PiL 2
-        local a = {}
-        for i, f in ipairs(files) do -- 'i' isn't used
-            a[#a + 1] = sites[op] .. f
-        end
-        allfiles = table.concat(a, " ")
-
-        return allfiles
-    end
-
-    dlcmd = cmd .. concatfiles()
-    print(dlcmd)
-    assert(os.execute(dlcmd), "can't download snapshot")
-end
+cd ..
