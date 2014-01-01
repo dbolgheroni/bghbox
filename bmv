@@ -48,9 +48,9 @@ opts.add_argument("-d",
 opts.add_argument("-p",
         help="padding used for the index (defaults to 2)",
         type=int)
-opts.add_argument("-z",
-        help="define if the counter starts with 0 (zero)",
-        action="store_true")
+opts.add_argument("-o",
+        help="define the start offset",
+        type=int)
 # TODO: implement this
 #opts.add_argument("-j",
 #        help="define a jump point",
@@ -58,10 +58,13 @@ opts.add_argument("-z",
 
 args = opts.parse_args()
 
-# -z argument
-n = 1
-if args.z:
-    n = 0
+# -o argument
+if args.o == None:
+    o = 1
+elif args.o == 0:
+    o = args.o
+else:
+    o = args.o
 
 # -p argument
 if args.p:
@@ -80,7 +83,7 @@ for f in args.file:
         extension = match.group('ext').lower()
 
     # -p argument
-    new = args.pattern + (padding % n) + "." + extension
+    new = args.pattern + (padding % o) + "." + extension
 
     # -d argument
     if args.d == False:
@@ -90,4 +93,4 @@ for f in args.file:
     else:
         print(old, "->", new, "(dummy)")
 
-    n += 1
+    o += 1
