@@ -1,0 +1,10 @@
+A sample file
+with
+multiple
+UTF-8
+characters
+like
+açúcar
+lines.
+
+OK?
