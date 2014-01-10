@@ -8,7 +8,7 @@ BEGIN {
     our (@ISA, @EXPORT, @EXPORT_OK);
 
     @ISA = qw(Exporter);
-    @EXPORT = qw(&dog);
+    @EXPORT = qw(&dog); # '&' is optional
     @EXPORT_OK = qw(bar);
 }
 
