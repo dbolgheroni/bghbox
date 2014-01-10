@@ -5,18 +5,29 @@ use strict;
 my ($empty);
 
 if (defined($empty)) {
-    print "first OK\n";
+    print "1 OK\n";
 }
 
 if ($empty) {
-    print "second OK\n";
+    print "2 OK\n";
 }
 
 $empty = "";
 if (defined($empty)) {
-    print "third OK\n";
+    print "3 OK\n";
 }
 
+$empty = 0;
+if (defined($empty)) {
+    print "4 OK\n";
+}
+
+$empty = "0";
+if (defined($empty)) {
+    print "5 OK\n";
+}
+
+
 if ($empty) {
-    print "fourth OK\n";
+    print "6 OK\n";
 }
