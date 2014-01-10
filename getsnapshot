@@ -5,7 +5,7 @@ arch=`uname -m`
 
 # download and parse ftp list
 ftp -V $listurl
-servers=`cat ftplist | sed 's/[[:space:]].*//'`
+servers=`cat ftplist | grep '^ftp' | sed 's/[[:space:]].*//'`
 if [ -e ftplist ]; then
    rm -fr ftplist
 fi
