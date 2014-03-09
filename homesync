@@ -7,7 +7,7 @@ if [ -z $DEVICE ]; then
     echo "usage: $0 device"
 else
     cd
-    rsync -rlptv --delete --exclude-from=$HOME/.rsync-exclude-file \
+    rsync -rlptv --delete --exclude-from=$HOME/.rsync-exclude \
 	. /mnt/$DEVICE/$BACKUPDIR
 fi
 
