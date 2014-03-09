@@ -18,6 +18,7 @@ select server in $servers; do
     if [ $server ]; then
         ftp -V \
             ${server}/snapshots/$arch/INSTALL* \
+            ${server}/snapshots/$arch/SHA256* \
             ${server}/snapshots/$arch/bsd* \
             ${server}/snapshots/$arch/*.tgz \
             ${server}/snapshots/ports.tar.gz
