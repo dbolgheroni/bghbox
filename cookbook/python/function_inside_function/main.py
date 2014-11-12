@@ -6,5 +6,6 @@ def foo():
 
     return bar()
 
-#bar() # won't work, bar() is only visible inside foo()
+# won't work, because it's only visible inside foo()
+#bar()
 print(foo())
