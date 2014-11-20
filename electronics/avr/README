@@ -1,0 +1,6 @@
+avr-gcc -g -mmcu=atmega328p -c lesson1.c -Wa,-alh,-L -o lesson1.o > lesson1.asm
+avr-gcc -g -mmcu=atmega328p -Wl,-Map,lesson1.map -o lesson1.elf lesson1.o
+avr-objdump -h -S lesson1.elf > lesson1.lst
+avr-objcopy -j .text -j .data -O ihex lesson1.elf lesson1.hex
+avr-size lesson1.elf
+sudo avrdude -b57600 -P /dev/cuaU0 -c avrisp -p m168 -U flash:w:lesson1.hex
