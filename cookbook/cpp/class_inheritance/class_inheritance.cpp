@@ -4,19 +4,18 @@
 
 class Parent {
 public:
-  static const int n = 1;
+  static const int x = 1;
 };
 
 class Child : public Parent {
 public:
-  static const int n = 2;
+  static const int y = 2;
 };
 
 int main() {
-  // Parent test;
+  //Parent test;
   Child test;
 
-  std::cout << test.n << std::endl;
+  std::cout << test.x << std::endl;
+  std::cout << test.y << std::endl;
 }
-
-
