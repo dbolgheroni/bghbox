@@ -1,5 +1,7 @@
 /* run only after page is loaded */
 $(function() {
+console.log("page loaded, executing script"); 
+
 var req = new XMLHttpRequest();
 
 req.open("GET", "note.xml");
@@ -12,4 +14,5 @@ req.onload = function () {
     document.getElementById("from").innerHTML = xmlDoc.getElementsByTagName("from")[0].childNodes[0].nodeValue;
     document.getElementById("message").innerHTML = xmlDoc.getElementsByTagName("body")[0].childNodes[0].nodeValue;
 };
+
 });

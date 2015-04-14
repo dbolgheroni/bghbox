@@ -1,5 +1,7 @@
 /* run only after page is loaded */
 $(function() {
+console.log("page loaded, executing script"); 
+
 var req = new XMLHttpRequest();
 
 req.open("GET", "note.json");
@@ -12,4 +14,5 @@ req.onload = function () {
     document.getElementById("from").innerHTML = response.from;
     document.getElementById("message").innerHTML = response.body;
 };
+
 });
