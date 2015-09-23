@@ -106,7 +106,7 @@ void loop(void) {
     serialEvent();
 
     if (strComplete) {
-        for (int i = 0; i <= NCMD; i++) {
+        for (int i = 0; i < NCMD; i++) {
             /* check if the command exists and call appropriate func if
              * found */
             if (cmdlist[i].name + '\r' == inputStr) {
