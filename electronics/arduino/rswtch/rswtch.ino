@@ -106,9 +106,9 @@ void loop(void) {
     serialEvent();
 
     if (strComplete) {
+        /* check if the command exists and call the appropriate func if
+         * found, passing the channel number as argument */
         for (int i = 0; i < NCMD; i++) {
-            /* check if the command exists and call appropriate func if
-             * found */
             if (cmdlist[i].name + '\r' == inputStr) {
                 (*cmdlist[i].func)(cmdlist[i].ch);
                 found = true;
