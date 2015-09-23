@@ -13,65 +13,138 @@
  * Arduino reference is at /usr/local/share/doc/arduino/reference/
  */
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <SPI.h>
-#include <Ethernet.h>
-#include <EthernetUdp.h>
+#define BOARDLED 13
+#define PS1 12
+#define PS2 11
+#define PS3 10
 
-/* Ethernet Shield uses pins 10, 11, 12 and 13 */
-#define SWITCH 9
+#define NCMD 32
 
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 1, 253);
+String inputStr = "";
+boolean strComplete = false;
 
-unsigned int localPort = 9000; /* port to listen */
+void serialEvent();
 
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE];
-char ReplyBuffer[] = "ack\n";
+void up_channel(int ch) {
+    digitalWrite(ch, HIGH);
+}
 
-EthernetUDP Udp;
+void down_channel(int ch) {
+    digitalWrite(ch, LOW);
+}
+
+void toggle_channel(int ch) {
+    if (digitalRead(ch) == LOW)
+        digitalWrite(ch, HIGH);
+    else
+        digitalWrite(ch, LOW);
+}
+
+void reset_channel(int ch) {
+    digitalWrite(ch, LOW);
+
+    /* wait 1,5 seconds to fully discharge */
+    delay(1500);
+
+    digitalWrite(ch, HIGH);
+}
+
+struct cmd {
+    String name;
+    int ch;
+    void (*func)(int ch);
+} cmdlist[] = {
+    { "u1", PS1, up_channel     },
+    { "u2", PS2, up_channel     },
+    { "u3", PS3, up_channel     },
+    { "d1", PS1, down_channel   },
+    { "d2", PS2, down_channel   },
+    { "d3", PS3, down_channel   },
+    { "t1", PS1, toggle_channel },
+    { "t2", PS2, toggle_channel },
+    { "t3", PS3, toggle_channel },
+    { "r1", PS1, reset_channel  },
+    { "r2", PS2, reset_channel  },
+    { "r3", PS3, reset_channel  }
+};
 
 void setup(void) {
-    /* relay uses complemented logic, HIGH is OFF */
-    pinMode(SWITCH, OUTPUT);
-    digitalWrite(SWITCH, HIGH);
+    /* initialize pins */
+    pinMode(BOARDLED, OUTPUT);
+    pinMode(PS1, OUTPUT);
+    pinMode(PS2, OUTPUT);
 
-    /* Ethernet shield */
-    Ethernet.begin(mac, ip);
-    Udp.begin(localPort);
+    /* turn off board led, use it to debug error */
+    digitalWrite(BOARDLED, LOW);
 
+    /* on by default */
+    digitalWrite(PS1, HIGH);
+    digitalWrite(PS2, HIGH);
+
+    /* initialize serial code */
     Serial.begin(115200);
 
-    /* configure the IP of the board */
-    Serial.println("Bolgh rswtch");
+    /* wait for serial to initialize */
+    delay(1000);
+
+    /* present itself */
+    Serial.println("rswtch");
+    Serial.print("> ");
+
+    inputStr.reserve(72);
 
     return;
 }
 
 void loop(void) {
-    /* if there's data available, read a packet */
-    int packetSize = Udp.parsePacket();
-    if(packetSize) {
-        /* read the packet into packetBufffer */
-        Udp.read(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
-        if (!strncmp(packetBuffer, "on\n", 3)) {
-            digitalWrite(SWITCH, LOW);
-        } else if (!strncmp(packetBuffer, "off\n", 3)) {
-            digitalWrite(SWITCH, HIGH);
+    boolean found = 0;
+    serialEvent();
+
+    if (strComplete) {
+        for (int i = 0; i <= NCMD; i++) {
+            /* check if the command exists and call appropriate func if
+             * found */
+            if (cmdlist[i].name + '\r' == inputStr) {
+                (*cmdlist[i].func)(cmdlist[i].ch);
+                found = true;
+                break;
+            }
         }
 
-        /* send a reply, to the IP address and port that sent us the
-         * packet we received */
-        Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        Udp.write(ReplyBuffer);
-        Udp.endPacket();
+        if (found) {
+            Serial.println("ok");
+            found = false;
+        } else {
+            Serial.println("error");
+        }
+
+        Serial.print("> ");
+
+        inputStr = "";
+        strComplete = false;
     }
 
-    delay(10);
     return;
+}
+
+void serialEvent() {
+    while (Serial.available()) {
+        char inChar = (char)Serial.read();
+        inputStr += inChar;
+
+        Serial.print(inChar);
+
+        /* do not work with '\n' */
+        if (inChar == '\r') {
+            strComplete = true;
+            Serial.println();
+        }
+    }
 }
 
 #ifdef __cplusplus

@@ -53,13 +53,29 @@ TARGET = ${.CURDIR:C/.*\///g}
 # Below are some known working hardware configurations. If you find other
 # working configurations, please feed them back to the OpenBSD porting team.
 
-## Arduino variant (Uno R3)
+## you might use this for newer boards like the UNO
 UPLOAD_RATE = 115200
 PORT = /dev/cuaU0
 AVRDUDE_PROGRAMMER = arduino
 MCU = atmega328p
 F_CPU = 16000000
 VARIANT = standard
+
+## for an arduino mega
+#UPLOAD_RATE = 57600
+#PORT = /dev/cuaU0
+#AVRDUDE_PROGRAMMER = arduino
+#MCU = atmega1280
+#F_CPU = 16000000
+#VARIANT = mega
+
+## or this for an older arduino
+#UPLOAD_RATE = 19200
+#PORT = /dev/cuaU0
+#AVRDUDE_PROGRAMMER = stk500
+#MCU = atmega328p
+#F_CPU = 16000000
+#VARIANT = standard
 
 # If your sketch uses any libraries, list them here, eg.
 # LIBRARIES=EEPROM LiquidCrystal Wire
@@ -70,8 +86,7 @@ VARIANT = standard
 #
 # To use the SD library:
 # LIBRARIES=SD File utility/SdFile utility/SdVolume utility/Sd2Card
-LIBRARIES=SPI Ethernet IPAddress Dhcp Dns EthernetClient EthernetServer \
-	  EthernetUdp utility/w5100 utility/socket new
+LIBRARIES=
 
 ############################################################################
 # Below here nothing should be changed...
@@ -183,10 +198,10 @@ mkdirs:
 applet_files: $(TARGET).ino
 	test -d applet || mkdir applet
 	echo '#include "Arduino.h"' > applet/$(TARGET).cpp
-	#echo '#ifdef __cplusplus' >> applet/$(TARGET).cpp
-	#echo 'extern "C" void __cxa_pure_virtual(void) { while(1); }' \
-	# 	>> applet/$(TARGET).cpp
-	#echo '#endif\n' >> applet/$(TARGET).cpp
+	echo '#ifdef __cplusplus' >> applet/$(TARGET).cpp
+	echo 'extern "C" void __cxa_pure_virtual(void) { while(1); }' \
+		>> applet/$(TARGET).cpp
+	echo '#endif\n' >> applet/$(TARGET).cpp
 	cat $(TARGET).ino >> applet/$(TARGET).cpp
 	cat $(ARDUINO)/cores/arduino/main.cpp >> applet/$(TARGET).cpp
 
