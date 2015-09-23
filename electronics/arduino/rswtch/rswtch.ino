@@ -48,7 +48,7 @@ void toggle_channel(int ch) {
 void reset_channel(int ch) {
     digitalWrite(ch, LOW);
 
-    /* wait 1,5 seconds to fully discharge */
+    /* wait 1.5 seconds to fully discharge */
     delay(1500);
 
     digitalWrite(ch, HIGH);
