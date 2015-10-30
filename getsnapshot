@@ -1,31 +1,42 @@
 #!/bin/sh
 
-listurl='ftp://ftp.openbsd.org/pub/OpenBSD/ftplist'
-arch=`uname -m`
+download() {
+    echo 'Servers available:'
 
-# download and parse ftp list
+    PS3='Choose a server: '
+    select server in $servers; do
+        if [ $server ]; then
+            ftp -V \
+                ${server}/snapshots/$arch/INSTALL.$arch \
+                ${server}/snapshots/$arch/SHA256 \
+                ${server}/snapshots/$arch/SHA256.sig \
+                ${server}/snapshots/$arch/bsd \
+                ${server}/snapshots/$arch/bsd.mp \
+                ${server}/snapshots/$arch/bsd.rd \
+                ${server}/snapshots/$arch/base${rel}.tgz \
+                ${server}/snapshots/$arch/comp${rel}.tgz \
+                ${server}/snapshots/$arch/game${rel}.tgz \
+                ${server}/snapshots/$arch/man${rel}.tgz \
+                ${server}/snapshots/$arch/xbase${rel}.tgz \
+                ${server}/snapshots/$arch/xfont${rel}.tgz \
+                ${server}/snapshots/$arch/xserv${rel}.tgz \
+                ${server}/snapshots/$arch/xshare${rel}.tgz
+            break
+        else
+            echo 'invalid selection'
+        fi
+    done
+}
+
+# download and parse mirrors list
+listurl='http://ftp.openbsd.org/pub/OpenBSD/ftplist'
 ftp -V $listurl
-servers=`cat ftplist | grep '^ftp' | sed 's/[[:space:]].*//'`
-if [ -e ftplist ]; then
-   rm -fr ftplist
-fi
+servers=$(cat ftplist | grep '^http' | sed 's/[[:space:]].*//')
 
-# presentation
-echo 'Servers available: '
+# filter snapshot release (no wildcards with http in ftp(1))
+arch=$(machine -a)
+index="http://ftp.openbsd.org/pub/OpenBSD/snapshots/${arch}/index.txt"
+ftp -V $index
+rel=$(cat index.txt | grep comp | awk '{ print $10 }' | sed 's/comp//; s/\..*//')
 
-PS3='Choose a server: '
-select server in $servers; do
-    if [ $server ]; then
-        ftp -V \
-            ${server}/snapshots/$arch/INSTALL* \
-            ${server}/snapshots/$arch/SHA256* \
-            ${server}/snapshots/$arch/bsd* \
-            ${server}/snapshots/$arch/*.tgz \
-            ${server}/snapshots/ports.tar.gz
-        break
-    else
-        echo 'invalid selection'
-    fi
-done
-
-cd ..
+download
