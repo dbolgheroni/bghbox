@@ -29,9 +29,7 @@ download() {
 }
 
 # download and parse mirrors list
-listurl='http://ftp.openbsd.org/pub/OpenBSD/ftplist'
-ftp -V $listurl
-servers=$(cat ftplist | grep '^http' | sed 's/[[:space:]].*//')
+servers=$(ftp -o - http://www.openbsd.org/build/mirrors.dat | grep -e ^UH | sed 's/^UH[[:space:]]*//')
 
 # filter snapshot release (no wildcards with http in ftp(1))
 arch=$(machine -a)
