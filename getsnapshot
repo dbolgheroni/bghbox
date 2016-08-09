@@ -1,26 +1,33 @@
 #!/bin/sh
 
-download() {
-    echo 'Servers available:'
+get_release() {
+    rel=$(ftp -V -o - http://ftp.openbsd.org/pub/OpenBSD/snapshots/${arch}/index.txt | grep comp | awk '{ print $10 }' | sed 's/comp//; s/\..*//')
+    return $rel
+}
 
+start_download() {
+    files="INSTALL.${arch} SHA256 SHA256.sig bsd bsd.rd base${rel}.tgz
+    comp${rel}.tgz game${rel}.tgz man${rel}.tgz xbase${rel}.tgz
+    xfont${rel}.tgz xserv${rel}.tgz xshare${rel}.tgz" 
+
+    # download and parse mirrors list
+    servers=$(ftp -V -o - http://www.openbsd.org/build/mirrors.dat | grep -e ^UH | sed 's/^UH[[:space:]]*//')
+
+    echo 'Servers available:'
     PS3='Choose a server: '
-    select server in $servers; do
-        if [ $server ]; then
-            ftp -V \
-                ${server}/snapshots/$arch/INSTALL.$arch \
-                ${server}/snapshots/$arch/SHA256 \
-                ${server}/snapshots/$arch/SHA256.sig \
-                ${server}/snapshots/$arch/bsd \
-                ${server}/snapshots/$arch/bsd.mp \
-                ${server}/snapshots/$arch/bsd.rd \
-                ${server}/snapshots/$arch/base${rel}.tgz \
-                ${server}/snapshots/$arch/comp${rel}.tgz \
-                ${server}/snapshots/$arch/game${rel}.tgz \
-                ${server}/snapshots/$arch/man${rel}.tgz \
-                ${server}/snapshots/$arch/xbase${rel}.tgz \
-                ${server}/snapshots/$arch/xfont${rel}.tgz \
-                ${server}/snapshots/$arch/xserv${rel}.tgz \
-                ${server}/snapshots/$arch/xshare${rel}.tgz
+    select server in ${servers}; do
+        if [ ${server} ]; then
+            for f in ${files}; do
+                fileurl="${server}${prefix}${f}"
+                allfiles="${allfiles} ${fileurl}"
+            done
+            ftp -V $allfiles
+
+            # arch specific
+            if [ ${arch} = "amd64" ]; then
+                ftp -V ${server}${prefix}bsd.mp
+            fi
+
             break
         else
             echo 'invalid selection'
@@ -28,13 +35,19 @@ download() {
     done
 }
 
-# download and parse mirrors list
-servers=$(ftp -o - http://www.openbsd.org/build/mirrors.dat | grep -e ^UH | sed 's/^UH[[:space:]]*//')
+# some archs have specific kernels/files (sgi), some have mp support and
+# some don't; so we have to define which arch to download to not try to
+# download files that don't exist
+archs='amd64 armv7'
 
-# filter snapshot release (no wildcards with http in ftp(1))
-arch=$(machine -a)
-index="http://ftp.openbsd.org/pub/OpenBSD/snapshots/${arch}/index.txt"
-ftp -V $index
-rel=$(cat index.txt | grep comp | awk '{ print $10 }' | sed 's/comp//; s/\..*//')
+echo 'Archs available: '
+PS3='Choose arch: '
+select arch in ${archs}; do
+    break
+done
+prefix="snapshots/${arch}/"
 
-download
+get_release
+rel=$?
+
+start_download
