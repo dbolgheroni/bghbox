@@ -1,7 +1,7 @@
 #!/bin/sh
 
 get_release() {
-    rel=$(ftp -V -o - http://ftp.openbsd.org/pub/OpenBSD/snapshots/${arch}/index.txt | grep comp | awk '{ print $10 }' | sed 's/comp//; s/\..*//')
+    rel=$(ftp -V -o - https://ftp.openbsd.org/pub/OpenBSD/snapshots/${arch}/index.txt | grep comp | awk '{ print $10 }' | sed 's/comp//; s/\..*//')
     return $rel
 }
 
@@ -11,7 +11,7 @@ start_download() {
     xfont${rel}.tgz xserv${rel}.tgz xshare${rel}.tgz" 
 
     # download and parse mirrors list
-    servers=$(ftp -V -o - http://www.openbsd.org/build/mirrors.dat | grep -e ^UH | sed 's/^UH[[:space:]]*//')
+    servers=$(ftp -V -o - https://www.openbsd.org/build/mirrors.dat | grep -e ^UHS | sed 's/^UHS[[:space:]]*//')
 
     echo 'Servers available:'
     PS3='Choose a server: '
