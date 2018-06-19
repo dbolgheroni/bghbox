@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# OpenBSD pkg_info offers no way to sort the packages by their sizes, so
+# pipe the output throught this to get it sorted.
+#
+# usage: pkg_info -sa | pkg_size
+
+sed -n '
+N; N; N;
+s/Information for inst:\(.*\)\n\nSize:\ \(.*\)\n/\2 \1/g;
+p;
+' | sort -rn
