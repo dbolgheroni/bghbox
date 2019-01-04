@@ -1,55 +1,33 @@
 #!/bin/sh
 
-get_release() {
-    rel=$(ftp -V -o - \
-        https://ftp.openbsd.org/pub/OpenBSD/snapshots/${arch}/index.txt | \
+######## guess arch if not given
+if [ -z $ARCH ]; then
+        ARCH=$(machine -a)
+fi
+
+######## extract the release version from what's on ftp
+REL=$(ftp -V -o - \
+        https://ftp.openbsd.org/pub/OpenBSD/snapshots/${ARCH}/index.txt | \
         awk '/comp/ { print(substr($10, 5, 2)); }')
-    return $rel
-}
 
-start_download() {
-    files="INSTALL.${arch} SHA256 SHA256.sig bsd bsd.rd base${rel}.tgz
-    comp${rel}.tgz game${rel}.tgz man${rel}.tgz xbase${rel}.tgz
-    xfont${rel}.tgz xserv${rel}.tgz xshare${rel}.tgz" 
+FILES="INSTALL.${ARCH} SHA256 SHA256.sig bsd bsd.rd base${REL}.tgz 
+        comp${REL}.tgz game${REL}.tgz man${REL}.tgz xbase${REL}.tgz
+        xfont${REL}.tgz xserv${REL}.tgz xshare${REL}.tgz" 
 
-    # download and parse mirrors list
-    servers=$(ftp -V -o - https://www.openbsd.org/build/mirrors.dat | sed -n '/^UHS[[:space:]]*/s///p')
-
-    echo 'Servers available:'
-    PS3='Choose a server: '
-    select server in ${servers}; do
-        if [ ${server} ]; then
-            for f in ${files}; do
-                fileurl="${server}${prefix}${f}"
-                allfiles="${allfiles} ${fileurl}"
-            done
-            ftp -V $allfiles
-
-            # arch specific
-            if [ ${arch} = "amd64" ]; then
-                ftp -V ${server}${prefix}bsd.mp
-            fi
-
-            break
-        else
-            echo 'invalid selection'
-        fi
-    done
-}
-
-# some archs have specific kernels/files (sgi), some have mp support and
-# some don't; so we have to define which arch to download to not try to
-# download files that don't exist
-archs='amd64 armv7'
-
-echo 'Archs available: '
-PS3='Choose arch: '
-select arch in ${archs}; do
-    break
+######## build download command
+CMD="ftp -V"
+for f in $FILES; do
+        CMD="${CMD} $(cat /etc/installurl)/snapshots/${ARCH}/${f}"
 done
-prefix="snapshots/${arch}/"
 
-get_release
-rel=$?
+# sgi follows a different rule, XXX
+MPARCHS='alpha amd64 arm64 hppa luna88k macppc octeon sparc64'
+for a in $MPARCHS; do
+        if [ $a = $ARCH ]; then
+                CMD="${CMD} $(cat /etc/installurl)/snapshots/${ARCH}/bsd.mp"
+                break
+        fi
+done
 
-start_download
+######## run download command
+$CMD
