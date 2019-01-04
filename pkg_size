@@ -5,7 +5,7 @@
 #
 # usage: pkg_info -sa | pkg_size
 
-sed -n '
+pkg_info -sa | sed -n '
 N; N; N;
 s/Information for inst:\(.*\)\n\nSize:\ \(.*\)\n/\2 \1/g;
 p;
